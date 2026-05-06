@@ -350,6 +350,34 @@
     text-decoration: underline; font-family: inherit;
   }
   .reset-link:hover { color: var(--red); }
+
+  /* OWNER PICKER */
+  .owner-picker {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px; justify-content: flex-end;
+  }
+  .owner-picker label {
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600;
+  }
+  .owner-picker select {
+    padding: 4px 10px; border: 1px solid var(--border);
+    border-radius: 6px; font-family: inherit; font-size: 13px;
+    background: var(--surface); font-weight: 500;
+  }
+  /* OWNER ACCENTS — visual differentiation when viewing 'all' */
+  .pill-owner {
+    margin-right: 6px;
+    text-transform: capitalize;
+    font-weight: 600;
+  }
+  .pill-owner-peri { background: #FAEEDA; color: #854F0B; }
+  .pill-owner-erin { background: #E1F5EE; color: #0F6E56; }
+  .pill-owner-aiden { background: #EEEDFE; color: #3C3489; }
+  .card.owner-erin { border-left: 3px solid #1D9E75; }
+  .card.owner-erin.off-plan { border-left: 3px solid var(--purple); }
+  .day-cell-task.owner-erin { border-right: 2px solid #1D9E75; }
+  .status-cell.owner-erin { border-right: 2px solid #1D9E75; }
 </style>
 </head>
 <body>
@@ -372,9 +400,17 @@
   <div class="header">
     <div class="brand">
       <h1>SIGNAL Dashboard</h1>
-      <div class="tag">Apply smarter. Get hired. — Peri's view</div>
+      <div class="tag">Apply smarter. Get hired. — <span id="brand-owner-label">loading…</span></div>
     </div>
     <div class="header-meta">
+      <div class="owner-picker">
+        <label>Viewing</label>
+        <select id="owner-picker">
+          <option value="peri">Peri</option>
+          <option value="erin">Erin</option>
+          <option value="all">Everyone</option>
+        </select>
+      </div>
       <div class="today-date" id="today-date"></div>
       <div class="day-counter" id="day-counter"></div>
     </div>
@@ -408,8 +444,12 @@
         <option value="">All channels</option>
         <option value="tiktok">TikTok</option>
         <option value="linkedin">LinkedIn</option>
+        <option value="instagram">Instagram</option>
+        <option value="facebook">Facebook</option>
         <option value="youtube">YouTube</option>
+        <option value="reddit">Reddit</option>
         <option value="production">Production</option>
+        <option value="ops">Ops</option>
         <option value="other">Other</option>
       </select>
       <select id="filter-stage">
@@ -540,7 +580,7 @@ async function sbFetch(path, opts = {}) {
 }
 
 async function loadAllTasks() {
-  return sbFetch(`signal_tasks?owner=eq.peri&order=task_date.asc,channel.asc`);
+  return sbFetch(`signal_tasks?owner=in.(peri,erin,aiden)&order=task_date.asc,owner.asc,channel.asc`);
 }
 
 async function updateTask(id, patch) {
@@ -580,6 +620,21 @@ function resetConfig() {
 let TASKS = [];
 let activeView = 'today';
 let viewingDate = null;
+let ownerView = localStorage.getItem('signal_owner_view') || 'peri'; // 'peri' | 'erin' | 'all'
+
+// Returns the subset of TASKS that should be visible based on the owner picker.
+function visibleTasks() {
+  if (ownerView === 'all') return TASKS;
+  return TASKS.filter(t => t.owner === ownerView);
+}
+
+function ownerLabel(o) {
+  if (o === 'peri') return "Peri's view";
+  if (o === 'erin') return "Erin's view";
+  if (o === 'aiden') return "Aiden's view";
+  if (o === 'all') return 'Everyone';
+  return '';
+}
 
 function getStage(t) {
   if (t.status_posted) return 'posted';
@@ -617,10 +672,12 @@ function renderHeader() {
   } else {
     document.getElementById('day-counter').textContent = `Day ${dayN} of 30`;
   }
+  document.getElementById('brand-owner-label').textContent = ownerLabel(ownerView);
+  document.getElementById('owner-picker').value = ownerView;
 }
 
 function renderProgress() {
-  const postable = TASKS.filter(t => t.task_type === 'post');
+  const postable = visibleTasks().filter(t => t.task_type === 'post');
   const posted = postable.filter(t => t.status_posted).length;
   const pct = postable.length === 0 ? 0 : Math.round((posted / postable.length) * 100);
   document.getElementById('progress-pct').textContent = `${posted} / ${postable.length} posts complete (${pct}%)`;
@@ -629,7 +686,7 @@ function renderProgress() {
 
 function renderToday() {
   const targetDate = viewingDate || getToday();
-  const todayTasks = TASKS.filter(t => t.task_date === targetDate);
+  const todayTasks = visibleTasks().filter(t => t.task_date === targetDate);
   const wrap = document.getElementById('view-today');
 
   let banner = '';
@@ -739,12 +796,14 @@ function renderTaskCard(t) {
   ` : '';
 
   const offPlanBadge = t.is_off_plan ? '<span class="pill pill-offplan">OFF-PLAN</span>' : '';
+  const ownerBadge = ownerView === 'all' ? `<span class="pill pill-owner pill-owner-${t.owner}">${t.owner}</span>` : '';
   const deleteBtn = t.is_off_plan ? `<button class="delete-btn" onclick="confirmDelete('${t.id}')">Delete</button>` : '';
 
   return `
-    <div class="card ${t.is_off_plan ? 'off-plan' : ''}">
+    <div class="card owner-${t.owner} ${t.is_off_plan ? 'off-plan' : ''}">
       <div class="card-head">
         <div>
+          ${ownerBadge}
           <span class="pill pill-${t.channel}">${channelLabel}</span>
           ${t.pillar ? `<span class="pill pill-pillar">${pillarLabel(t.pillar)}</span>` : ''}
           ${taskTypeLabel ? `<span class="pill pill-production">${taskTypeLabel}</span>` : ''}
@@ -832,7 +891,7 @@ function renderMonth() {
 }
 
 function renderDayCell(d, today, compact) {
-  const dayTasks = TASKS.filter(t => t.task_date === d).filter(t => t.task_type === 'post' || t.task_type === 'batch_shoot');
+  const dayTasks = visibleTasks().filter(t => t.task_date === d).filter(t => t.task_type === 'post' || t.task_type === 'batch_shoot' || t.task_type === 'review' || t.task_type === 'standup');
   const dayNum = dayNumberFromDate(d);
   const isToday = d === today;
   const isPast = d < today;
@@ -845,7 +904,7 @@ function renderDayCell(d, today, compact) {
     const isPosted = t.status_posted;
     const isBatch = t.task_type === 'batch_shoot';
     const offPlan = t.is_off_plan;
-    const cls = ['day-cell-task', isBatch ? 'batch' : '', isPosted ? 'posted' : '', offPlan ? 'off-plan' : ''].filter(Boolean).join(' ');
+    const cls = ['day-cell-task', isBatch ? 'batch' : '', isPosted ? 'posted' : '', offPlan ? 'off-plan' : '', `owner-${t.owner}`].filter(Boolean).join(' ');
     const titleStr = t.title.length > (compact ? 32 : 48) ? t.title.slice(0, compact ? 32 : 48) + '…' : t.title;
     const prefix = isBatch ? '🎬 ' : '';
     const channel = compact ? t.channel.slice(0, 2).toUpperCase() : t.channel.toUpperCase();
@@ -878,7 +937,12 @@ function renderStatus() {
   const allDays = [];
   for (let i = 1; i <= 30; i++) allDays.push(dateForDay(i));
 
-  const channelCols = ['tiktok', 'linkedin', 'youtube', 'production', 'other'];
+  // Status columns adapt slightly based on who's being viewed.
+  // For Peri, the original channels are most relevant.
+  // For Erin or All, expand to cover her platforms.
+  const channelCols = ownerView === 'peri'
+    ? ['tiktok', 'linkedin', 'youtube', 'production', 'other']
+    : ['tiktok', 'linkedin', 'instagram', 'facebook', 'youtube', 'reddit', 'ops'];
 
   const html = `
     <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
@@ -907,14 +971,14 @@ function renderStatus() {
                 <div style="font-size:11px; color:var(--text-muted);">${dateLabel}</div>
               </td>
               ${channelCols.map(c => {
-                const cellTasks = TASKS.filter(t => t.task_date === d && t.channel === c && (t.task_type === 'post' || t.task_type === 'batch_shoot'));
+                const cellTasks = visibleTasks().filter(t => t.task_date === d && t.channel === c);
                 if (cellTasks.length === 0) return `<td>—</td>`;
                 return `<td>${cellTasks.map(t => {
                   const stage = getStage(t);
                   const cls = stage === 'posted' ? 'posted' : (stage === 'not_started' ? 'not-started' : 'in-flight');
                   const offPlanCls = t.is_off_plan ? ' off-plan' : '';
                   const icon = stage === 'posted' ? '✓ ' : (stage === 'not_started' ? '○ ' : '◐ ');
-                  return `<span class="status-cell ${cls}${offPlanCls}" data-task-jump="${t.id}" data-date="${d}" title="${escapeAttr(t.title)} — ${stage.replace('_', ' ')}">${icon}${escapeHtml(t.title.length > 22 ? t.title.slice(0, 22) + '…' : t.title)}</span>`;
+                  return `<span class="status-cell ${cls}${offPlanCls} owner-${t.owner}" data-task-jump="${t.id}" data-date="${d}" title="${escapeAttr(t.title)} — ${t.owner} — ${stage.replace('_', ' ')}">${icon}${escapeHtml(t.title.length > 22 ? t.title.slice(0, 22) + '…' : t.title)}</span>`;
                 }).join('')}</td>`;
               }).join('')}
             </tr>
@@ -940,7 +1004,13 @@ function renderPipeline() {
   const planFilter = document.getElementById('filter-plan').value;
   const today = getToday();
 
-  let filtered = TASKS.filter(t => t.task_type === 'post' || t.task_type === 'batch_shoot');
+  let filtered = visibleTasks().filter(t =>
+    t.task_type === 'post' ||
+    t.task_type === 'batch_shoot' ||
+    t.task_type === 'review' ||
+    t.task_type === 'standup' ||
+    t.task_type === 'other'
+  );
   if (channelFilter) filtered = filtered.filter(t => t.channel === channelFilter);
   if (stageFilter) filtered = filtered.filter(t => getStage(t) === stageFilter);
   if (planFilter === 'planned') filtered = filtered.filter(t => !t.is_off_plan);
@@ -1091,7 +1161,7 @@ async function saveNewTask() {
   const newTask = {
     day_number: dayN,
     task_date: date,
-    owner: 'peri',
+    owner: ownerView === 'all' ? 'peri' : ownerView,
     channel: channel,
     task_type: 'post',
     title: title,
@@ -1159,7 +1229,7 @@ async function init() {
   try {
     TASKS = await loadAllTasks();
   } catch (e) {
-    alert('Could not load tasks: ' + e.message + '\n\nMake sure 01_schema.sql, 02_seed_peri.sql, and 03_schema_patch_v2.sql have all been run in Supabase.');
+    alert('Could not load tasks: ' + e.message + '\n\nMake sure all SQL files have been run in Supabase: 01_schema.sql, 02_seed_peri.sql, 03_schema_patch_v2.sql, and 04_seed_erin.sql.');
     resetConfig();
     return;
   }
@@ -1170,6 +1240,16 @@ async function init() {
 
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => switchView(tab.dataset.view));
+  });
+
+  // Owner picker — switch which owner's tasks are shown.
+  // Persists the choice per-device in localStorage.
+  document.getElementById('owner-picker').addEventListener('change', e => {
+    ownerView = e.target.value;
+    localStorage.setItem('signal_owner_view', ownerView);
+    renderHeader();
+    renderProgress();
+    renderActiveView();
   });
 
   document.getElementById('filter-channel').addEventListener('change', renderPipeline);
