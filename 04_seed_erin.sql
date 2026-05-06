@@ -672,23 +672,37 @@ The lesson: you don''t need to apply to more. You need to apply to better. The h
 -- ERIN OPS — DAILY MORNING METRICS PULL (every day, 5 min)
 -- =============================================================
 
-insert into signal_tasks (day_number, task_date, owner, channel, task_type, title, body)
-select n, date_for_day, 'erin', 'ops', 'other',
-  'Morning metrics pull (5 min)',
-  'Pull daily numbers into SIGNAL_Metrics_Daily.gsheet:
-- Free scans completed (prior day)
-- Paid signups (prior day)
-- Total ad spend (Meta + TikTok + Google)
-- CPL by channel
-- CPP by channel
-- TikTok views (per post)
-- Email open rates (welcome / nurture / parent)
-
-Sources: GA4, Meta Ads Manager, TikTok Ads Manager, Google Ads, Customer.io.'
-from (
-  select generate_series(1, 30) as n,
-         (date '2026-05-04' + (generate_series(1, 30) - 1))::date as date_for_day
-) days;
+insert into signal_tasks (day_number, task_date, owner, channel, task_type, title, body) values
+(1, '2026-05-04', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans completed (prior day), paid signups (prior day), total ad spend (Meta + TikTok + Google), CPL by channel, CPP by channel, TikTok views (per post), email open rates (welcome / nurture / parent). Sources: GA4, Meta Ads Manager, TikTok Ads Manager, Google Ads, Customer io.'),
+(2, '2026-05-05', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(3, '2026-05-06', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(4, '2026-05-07', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(5, '2026-05-08', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(6, '2026-05-09', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(7, '2026-05-10', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(8, '2026-05-11', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(9, '2026-05-12', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(10, '2026-05-13', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(11, '2026-05-14', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(12, '2026-05-15', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(13, '2026-05-16', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(14, '2026-05-17', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(15, '2026-05-18', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(16, '2026-05-19', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(17, '2026-05-20', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(18, '2026-05-21', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(19, '2026-05-22', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(20, '2026-05-23', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(21, '2026-05-24', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(22, '2026-05-25', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(23, '2026-05-26', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(24, '2026-05-27', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(25, '2026-05-28', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(26, '2026-05-29', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(27, '2026-05-30', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(28, '2026-05-31', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(29, '2026-06-01', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.'),
+(30, '2026-06-02', 'erin', 'ops', 'other', 'Morning metrics pull (5 min)', 'Pull daily numbers into SIGNAL_Metrics_Daily sheet: free scans, paid signups, ad spend, CPL by channel, CPP by channel, TikTok views, email open rates.');
 
 
 -- =============================================================
