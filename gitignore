@@ -1,0 +1,17 @@
+# Never commit secrets
+.env
+.env.local
+.env.*.local
+secrets.json
+config.local.js
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Backups
+*_backup.html
+*.bak

@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SIGNAL Dashboard — Peri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B2545;
+    --navy-soft: #16365C;
+    --orange: #E07A2F;
+    --bg: #FAFAF7;
+    --surface: #FFFFFF;
+    --border: #E5E3DC;
+    --border-strong: #D3D1C7;
+    --text: #1F1F1D;
+    --text-muted: #6B6B66;
+    --text-faint: #9A9A93;
+    --green: #3B6D11;
+    --green-bg: #EAF3DE;
+    --amber: #BA7517;
+    --amber-bg: #FAEEDA;
+    --red: #A32D2D;
+    --red-bg: #FCEBEB;
+    --blue: #185FA5;
+    --blue-bg: #E6F1FB;
+    --purple: #3C3489;
+    --purple-bg: #EEEDFE;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .app { max-width: 1280px; margin: 0 auto; padding: 24px 32px 80px; }
+  .header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+  }
+  .brand h1 { margin: 0; font-size: 22px; font-weight: 600; color: var(--navy); letter-spacing: -0.01em; }
+  .brand .tag { margin: 2px 0 0; font-size: 13px; color: var(--text-muted); }
+  .header-meta { text-align: right; }
+  .header-meta .today-date { font-size: 14px; color: var(--text-muted); }
+  .header-meta .day-counter { font-size: 18px; font-weight: 500; color: var(--navy); margin-top: 2px; }
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 24px;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center;
+  }
+  .tab {
+    background: none; border: none; padding: 10px 16px;
+    font-size: 14px; font-weight: 500; color: var(--text-muted);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s; font-family: inherit;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--navy); border-bottom-color: var(--orange); }
+  .tab-spacer { flex: 1; }
+  .add-btn {
+    background: var(--orange); color: white; border: none;
+    padding: 8px 16px; border-radius: 6px; font-weight: 500;
+    cursor: pointer; font-family: inherit; font-size: 13px; margin: 4px 0;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .add-btn:hover { background: #C56B26; }
+  .progress-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 20px; margin-bottom: 20px;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--text-muted); margin-bottom: 8px;
+  }
+  .progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--orange); transition: width 0.3s; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .card.off-plan { border-left: 3px solid var(--purple); }
+  .card-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; gap: 12px; flex-wrap: wrap;
+  }
+  .card-title {
+    font-size: 16px; font-weight: 600; color: var(--navy); margin: 0;
+    border: none; background: transparent; width: 100%;
+    font-family: inherit; padding: 4px 6px; border-radius: 4px;
+  }
+  .card-title:hover { background: var(--bg); }
+  .card-title:focus { outline: 2px solid var(--orange); background: var(--surface); }
+  .card-subtitle {
+    font-size: 12px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500;
+  }
+  .pill {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .pill-tiktok { background: var(--blue-bg); color: var(--blue); }
+  .pill-linkedin { background: var(--blue-bg); color: var(--blue); }
+  .pill-youtube { background: var(--red-bg); color: var(--red); }
+  .pill-instagram { background: #FBEAF0; color: #993556; }
+  .pill-facebook { background: var(--blue-bg); color: var(--blue); }
+  .pill-production { background: var(--amber-bg); color: var(--amber); }
+  .pill-reddit { background: var(--amber-bg); color: var(--amber); }
+  .pill-other { background: #F1EFE8; color: #5F5E5A; }
+  .pill-pillar { background: #F1EFE8; color: #444441; margin-left: 6px; }
+  .pill-offplan { background: var(--purple-bg); color: var(--purple); margin-left: 6px; }
+  .script-section { margin-top: 14px; }
+  .script-section + .script-section {
+    margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border);
+  }
+  .script-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); font-weight: 600; margin-bottom: 6px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .copy-btn, .edit-btn {
+    background: none; border: 1px solid var(--border);
+    border-radius: 4px; padding: 2px 8px; font-size: 11px;
+    cursor: pointer; color: var(--text-muted); font-family: inherit;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover, .edit-btn:hover {
+    background: var(--bg); color: var(--text); border-color: var(--border-strong);
+  }
+  .copy-btn.copied { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+  .script-text {
+    font-size: 14px; line-height: 1.6; color: var(--text);
+    white-space: pre-wrap; background: var(--bg); border-radius: 6px;
+    padding: 12px 14px; border: 1px solid var(--border);
+    font-family: inherit; width: 100%; resize: vertical; min-height: 50px;
+  }
+  .script-text:focus { outline: none; border-color: var(--orange); background: var(--surface); }
+  .script-text.hook { font-weight: 500; }
+  .script-text.osc { font-style: italic; color: var(--text-muted); font-size: 13px; }
+  .pipeline {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .stage {
+    display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+    border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+    background: var(--surface); user-select: none; transition: all 0.15s; font-size: 13px;
+  }
+  .stage:hover { border-color: var(--border-strong); }
+  .stage.done { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .stage .check {
+    width: 16px; height: 16px; border: 1.5px solid currentColor;
+    border-radius: 4px; display: inline-flex; align-items: center;
+    justify-content: center; font-size: 11px; font-weight: 700;
+  }
+  .stage.done .check::before { content: '✓'; }
+  .meta-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px;
+  }
+  .meta-row label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 6px;
+  }
+  .meta-row input, .meta-row textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+    border-radius: 6px; font-family: inherit; font-size: 13px;
+    background: var(--bg); color: var(--text); resize: vertical;
+  }
+  .meta-row input:focus, .meta-row textarea:focus { outline: none; border-color: var(--orange); }
+  .delete-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--text-muted); padding: 4px 10px; border-radius: 4px;
+    font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  .delete-btn:hover { background: var(--red-bg); color: var(--red); border-color: var(--red); }
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+  .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+  .month-grid .day-cell { min-height: 130px; padding: 8px; }
+  .month-grid .day-cell-task { font-size: 11px; padding: 3px 5px; }
+  .month-weekday-row {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 8px; margin-bottom: 6px;
+  }
+  .month-weekday {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted); padding: 4px 8px;
+  }
+  .day-cell {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 10px; min-height: 200px;
+    cursor: pointer; transition: all 0.15s; overflow: hidden;
+  }
+  .day-cell:hover { border-color: var(--orange); transform: translateY(-1px); }
+  .day-cell.is-today { background: #FFF8EE; border-color: var(--orange); border-width: 2px; }
+  .day-cell.is-past { opacity: 0.7; }
+  .day-cell.empty {
+    background: transparent; border: 1px dashed var(--border);
+    cursor: default; opacity: 0.4;
+  }
+  .day-cell.empty:hover { transform: none; border-color: var(--border); }
+  .day-cell-head {
+    font-size: 11px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;
+  }
+  .day-cell-num { font-size: 14px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+  .day-cell-task {
+    font-size: 12px; color: var(--text); line-height: 1.4; margin-bottom: 4px;
+    padding: 4px 6px; border-radius: 4px; background: var(--bg);
+  }
+  .day-cell-task.batch { background: var(--amber-bg); color: var(--amber); font-weight: 500; }
+  .day-cell-task.posted { background: var(--green-bg); color: var(--green); }
+  .day-cell-task.off-plan { border-left: 2px solid var(--purple); }
+  .pipeline-table {
+    width: 100%; border-collapse: collapse; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .pipeline-table th {
+    text-align: left; padding: 12px 14px; background: var(--bg);
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-muted); font-weight: 600; border-bottom: 1px solid var(--border);
+  }
+  .pipeline-table td {
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    font-size: 13px; vertical-align: middle;
+  }
+  .pipeline-table tr:last-child td { border-bottom: none; }
+  .pipeline-table tr:hover { background: var(--bg); }
+  .pipeline-table tr.is-today { background: #FFF8EE; }
+  .stage-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 500;
+  }
+  .stage-not_started { background: #F1EFE8; color: #5F5E5A; }
+  .stage-script_ready { background: var(--blue-bg); color: var(--blue); }
+  .stage-filmed { background: #FBEAF0; color: #993556; }
+  .stage-edited { background: var(--amber-bg); color: var(--amber); }
+  .stage-uploaded { background: var(--purple-bg); color: var(--purple); }
+  .stage-posted { background: var(--green-bg); color: var(--green); }
+  .status-table {
+    width: 100%; border-collapse: collapse; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  }
+  .status-table th, .status-table td {
+    padding: 8px 10px; border-bottom: 1px solid var(--border);
+    font-size: 12px; text-align: center;
+  }
+  .status-table th {
+    background: var(--bg); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600;
+  }
+  .status-table td.day-col { text-align: left; white-space: nowrap; font-weight: 500; }
+  .status-table tr.is-today { background: #FFF8EE; }
+  .status-table tr.is-today td { font-weight: 500; }
+  .status-cell {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 6px; border-radius: 4px; background: var(--bg);
+    font-size: 11px; cursor: pointer; transition: all 0.15s; margin: 2px;
+    max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .status-cell:hover { background: var(--border); }
+  .status-cell.posted { background: var(--green-bg); color: var(--green); }
+  .status-cell.in-flight { background: var(--amber-bg); color: var(--amber); }
+  .status-cell.not-started { background: var(--bg); color: var(--text-muted); }
+  .status-cell.off-plan { border-left: 2px solid var(--purple); }
+  .view { display: none; }
+  .view.active { display: block; }
+  .empty-state {
+    background: var(--surface); border: 1px dashed var(--border-strong);
+    border-radius: 10px; padding: 40px 24px; text-align: center; color: var(--text-muted);
+  }
+  .empty-state h3 { color: var(--navy); margin: 0 0 8px; }
+  .config-form {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px; max-width: 560px; margin: 60px auto;
+  }
+  .config-form h2 { margin: 0 0 8px; color: var(--navy); }
+  .config-form p { color: var(--text-muted); font-size: 14px; margin: 0 0 20px; }
+  .config-form label { display: block; font-size: 13px; font-weight: 500; margin: 14px 0 4px; }
+  .config-form input {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: 6px; font-family: 'SF Mono', Monaco, monospace; font-size: 13px;
+  }
+  .config-form button {
+    margin-top: 20px; background: var(--orange); color: white;
+    border: none; padding: 10px 20px; border-radius: 6px;
+    font-weight: 500; cursor: pointer; font-family: inherit; font-size: 14px;
+  }
+  .config-form button:hover { background: #C56B26; }
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(11, 37, 69, 0.5);
+    display: none; align-items: center; justify-content: center;
+    z-index: 100; padding: 20px;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 12px; width: 100%;
+    max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 28px;
+  }
+  .modal h2 { margin: 0 0 8px; color: var(--navy); font-size: 20px; }
+  .modal p.modal-tag { color: var(--text-muted); font-size: 13px; margin: 0 0 20px; }
+  .modal label {
+    display: block; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted);
+    font-weight: 600; margin: 14px 0 4px;
+  }
+  .modal input, .modal select, .modal textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border);
+    border-radius: 6px; font-family: inherit; font-size: 14px;
+    background: var(--bg); color: var(--text); resize: vertical;
+  }
+  .modal input:focus, .modal select:focus, .modal textarea:focus {
+    outline: none; border-color: var(--orange); background: var(--surface);
+  }
+  .modal-actions {
+    display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px;
+  }
+  .modal-actions button {
+    padding: 9px 16px; border-radius: 6px; font-family: inherit;
+    font-size: 14px; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--border); background: var(--surface);
+  }
+  .modal-actions .btn-primary {
+    background: var(--orange); color: white; border-color: var(--orange);
+  }
+  .modal-actions .btn-primary:hover { background: #C56B26; }
+  .modal-actions button:not(.btn-primary):hover { background: var(--bg); }
+  .modal-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .save-indicator {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--navy); color: white;
+    padding: 8px 16px; border-radius: 6px; font-size: 13px;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 50;
+  }
+  .save-indicator.show { opacity: 1; }
+  .filter-bar {
+    display: flex; gap: 8px; margin-bottom: 16px;
+    align-items: center; flex-wrap: wrap;
+  }
+  .filter-bar select {
+    padding: 6px 10px; border: 1px solid var(--border);
+    border-radius: 6px; font-family: inherit; font-size: 13px;
+    background: var(--surface);
+  }
+  .reset-link {
+    margin-left: auto; background: none; border: none;
+    color: var(--text-muted); cursor: pointer; font-size: 12px;
+    text-decoration: underline; font-family: inherit;
+  }
+  .reset-link:hover { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div id="config-screen" style="display:none;">
+  <div class="config-form">
+    <h2>SIGNAL Dashboard Setup</h2>
+    <p>Paste your Supabase project URL and anon key. Found in Supabase &rarr; Settings &rarr; API. Stored only in your browser.</p>
+    <label>Supabase URL</label>
+    <input id="cfg-url" placeholder="https://xxxxx.supabase.co" />
+    <label>Anon (public) key</label>
+    <input id="cfg-key" placeholder="eyJhbGc..." />
+    <button onclick="saveConfig()">Connect</button>
+    <p style="margin-top: 24px; font-size: 12px;">First time? Run <code>01_schema.sql</code>, <code>02_seed_peri.sql</code>, then <code>03_schema_patch_v2.sql</code> in your Supabase SQL editor before connecting.</p>
+  </div>
+</div>
+
+<div id="app" class="app" style="display:none;">
+
+  <div class="header">
+    <div class="brand">
+      <h1>SIGNAL Dashboard</h1>
+      <div class="tag">Apply smarter. Get hired. — Peri's view</div>
+    </div>
+    <div class="header-meta">
+      <div class="today-date" id="today-date"></div>
+      <div class="day-counter" id="day-counter"></div>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="progress-label">Month progress</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-view="today">Today</button>
+    <button class="tab" data-view="week">Week</button>
+    <button class="tab" data-view="month">Month</button>
+    <button class="tab" data-view="status">Status</button>
+    <button class="tab" data-view="pipeline">Pipeline</button>
+    <div class="tab-spacer"></div>
+    <button class="add-btn" onclick="openAddModal()">＋ Add task</button>
+  </div>
+
+  <div class="view active" id="view-today"></div>
+  <div class="view" id="view-week"></div>
+  <div class="view" id="view-month"></div>
+  <div class="view" id="view-status"></div>
+  <div class="view" id="view-pipeline">
+    <div class="filter-bar">
+      <select id="filter-channel">
+        <option value="">All channels</option>
+        <option value="tiktok">TikTok</option>
+        <option value="linkedin">LinkedIn</option>
+        <option value="youtube">YouTube</option>
+        <option value="production">Production</option>
+        <option value="other">Other</option>
+      </select>
+      <select id="filter-stage">
+        <option value="">All stages</option>
+        <option value="not_started">Not started</option>
+        <option value="script_ready">Script ready</option>
+        <option value="filmed">Filmed</option>
+        <option value="edited">Edited</option>
+        <option value="uploaded">Uploaded</option>
+        <option value="posted">Posted</option>
+      </select>
+      <select id="filter-plan">
+        <option value="">All tasks</option>
+        <option value="planned">Planned only</option>
+        <option value="off_plan">Off-plan only</option>
+      </select>
+      <button class="reset-link" onclick="resetConfig()">Reset connection</button>
+    </div>
+    <div id="pipeline-list"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="add-modal">
+  <div class="modal">
+    <h2 id="modal-title">Add an off-plan task</h2>
+    <p class="modal-tag">For posts you make outside the original 30-day plan.</p>
+
+    <div class="modal-grid-2">
+      <div>
+        <label>Date</label>
+        <input type="date" id="m-date" />
+      </div>
+      <div>
+        <label>Channel</label>
+        <select id="m-channel">
+          <option value="tiktok">TikTok</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="instagram">Instagram</option>
+          <option value="youtube">YouTube</option>
+          <option value="facebook">Facebook</option>
+          <option value="reddit">Reddit</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Title (short, for lists)</label>
+    <input type="text" id="m-title" placeholder="e.g. Off-the-cuff Sunday TikTok about cover letters" />
+
+    <label>Hook (optional)</label>
+    <textarea id="m-hook" rows="2"></textarea>
+
+    <label>Body / Script (optional)</label>
+    <textarea id="m-body" rows="4"></textarea>
+
+    <label>Caption (optional)</label>
+    <textarea id="m-caption" rows="2"></textarea>
+
+    <label>Hashtags (optional)</label>
+    <input type="text" id="m-hashtags" />
+
+    <div class="modal-actions">
+      <button onclick="closeAddModal()">Cancel</button>
+      <button class="btn-primary" id="modal-save-btn" onclick="saveNewTask()">Add task</button>
+    </div>
+  </div>
+</div>
+
+<div class="save-indicator" id="save-indicator">Saved</div>
+
+<script>
+const TODAY_OVERRIDE = null;
+const LAUNCH_DATE = '2026-05-04';
+const FINAL_DATE = '2026-06-02';
+
+let SUPABASE_URL = localStorage.getItem('signal_supabase_url');
+let SUPABASE_KEY = localStorage.getItem('signal_supabase_key');
+
+function getToday() {
+  if (TODAY_OVERRIDE) return TODAY_OVERRIDE;
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function dayNumberFromDate(dateStr) {
+  const launch = new Date(LAUNCH_DATE + 'T00:00:00');
+  const target = new Date(dateStr + 'T00:00:00');
+  return Math.floor((target - launch) / 86400000) + 1;
+}
+
+function dateForDay(n) {
+  const launch = new Date(LAUNCH_DATE + 'T00:00:00');
+  launch.setDate(launch.getDate() + (n - 1));
+  return launch.toISOString().slice(0, 10);
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function formatDateShort(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+
+async function sbFetch(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...opts,
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Supabase ${res.status}: ${text}`);
+  }
+  if (res.status === 204) return null;
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function loadAllTasks() {
+  return sbFetch(`signal_tasks?owner=eq.peri&order=task_date.asc,channel.asc`);
+}
+
+async function updateTask(id, patch) {
+  return sbFetch(`signal_tasks?id=eq.${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch)
+  });
+}
+
+async function insertTask(task) {
+  return sbFetch(`signal_tasks`, {
+    method: 'POST',
+    body: JSON.stringify(task)
+  });
+}
+
+async function deleteTask(id) {
+  return sbFetch(`signal_tasks?id=eq.${id}`, { method: 'DELETE' });
+}
+
+function saveConfig() {
+  const url = document.getElementById('cfg-url').value.trim().replace(/\/$/, '');
+  const key = document.getElementById('cfg-key').value.trim();
+  if (!url || !key) { alert('Both fields required.'); return; }
+  localStorage.setItem('signal_supabase_url', url);
+  localStorage.setItem('signal_supabase_key', key);
+  location.reload();
+}
+
+function resetConfig() {
+  if (!confirm('Disconnect from Supabase? Your data is unaffected.')) return;
+  localStorage.removeItem('signal_supabase_url');
+  localStorage.removeItem('signal_supabase_key');
+  location.reload();
+}
+
+let TASKS = [];
+let activeView = 'today';
+let viewingDate = null;
+
+function getStage(t) {
+  if (t.status_posted) return 'posted';
+  if (t.status_uploaded) return 'uploaded';
+  if (t.status_edited) return 'edited';
+  if (t.status_filmed) return 'filmed';
+  if (t.status_script_ready) return 'script_ready';
+  return 'not_started';
+}
+
+function pillarLabel(p) {
+  if (!p) return '';
+  return p.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function escapeAttr(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function renderHeader() {
+  const today = getToday();
+  document.getElementById('today-date').textContent = formatDate(today);
+  const dayN = dayNumberFromDate(today);
+  if (dayN < 1) {
+    document.getElementById('day-counter').textContent = `Pre-launch (Day ${dayN})`;
+  } else if (dayN > 30) {
+    document.getElementById('day-counter').textContent = `Past Day 30`;
+  } else {
+    document.getElementById('day-counter').textContent = `Day ${dayN} of 30`;
+  }
+}
+
+function renderProgress() {
+  const postable = TASKS.filter(t => t.task_type === 'post');
+  const posted = postable.filter(t => t.status_posted).length;
+  const pct = postable.length === 0 ? 0 : Math.round((posted / postable.length) * 100);
+  document.getElementById('progress-pct').textContent = `${posted} / ${postable.length} posts complete (${pct}%)`;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function renderToday() {
+  const targetDate = viewingDate || getToday();
+  const todayTasks = TASKS.filter(t => t.task_date === targetDate);
+  const wrap = document.getElementById('view-today');
+
+  let banner = '';
+  if (viewingDate) {
+    banner = `<div style="margin-bottom:14px; font-size:13px; color:var(--text-muted);">
+      Showing <strong>${formatDate(viewingDate)}</strong> —
+      <a href="#" onclick="returnToToday();return false;" style="color:var(--orange);">jump back to today</a>
+    </div>`;
+  }
+
+  if (todayTasks.length === 0) {
+    wrap.innerHTML = banner + `
+      <div class="empty-state">
+        <h3>No tasks for ${viewingDate ? formatDate(viewingDate) : 'today'}</h3>
+        <p>Either you're between days, or this is a rest day. Use the <strong>+ Add task</strong> button to log an off-plan post.</p>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = banner + todayTasks.map(renderTaskCard).join('');
+  attachCardHandlers();
+}
+
+function returnToToday() {
+  viewingDate = null;
+  renderToday();
+}
+
+function renderTaskCard(t) {
+  const channelLabel = t.channel.charAt(0).toUpperCase() + t.channel.slice(1);
+  const taskTypeLabel = t.task_type === 'batch_shoot' ? 'BATCH SHOOT' :
+                       t.task_type === 'standup' ? 'STANDUP' :
+                       t.task_type === 'review' ? 'REVIEW' : '';
+
+  const fields = [
+    { key: 'hook', label: 'Hook', cls: 'hook' },
+    { key: 'body', label: 'Body / Script' },
+    { key: 'on_screen_text', label: 'On-Screen Text', cls: 'osc' },
+    { key: 'cta', label: 'CTA' },
+    { key: 'caption', label: 'Caption' },
+    { key: 'hashtags', label: 'Hashtags' }
+  ];
+
+  const visibleFields = fields.filter(f => t[f.key] && String(t[f.key]).trim() !== '');
+  const emptyFields = fields.filter(f => !t[f.key] || String(t[f.key]).trim() === '');
+
+  const sectionsHtml = visibleFields.map(f => `
+    <div class="script-section">
+      <div class="script-label">
+        <span>${f.label}</span>
+        <button class="copy-btn" data-copy-target="field-${t.id}-${f.key}">Copy</button>
+      </div>
+      <textarea
+        class="script-text ${f.cls || ''}"
+        id="field-${t.id}-${f.key}"
+        data-task="${t.id}"
+        data-field="${f.key}"
+        rows="${f.key === 'body' ? 5 : (f.key === 'hook' || f.key === 'cta' ? 2 : 3)}"
+      >${escapeHtml(t[f.key])}</textarea>
+    </div>
+  `).join('');
+
+  const addFieldButtons = emptyFields.length > 0 ? `
+    <div class="script-section" style="border-top: none; padding-top: 8px;">
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Add a field:</div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        ${emptyFields.map(f => `
+          <button class="copy-btn" onclick="addEmptyField('${t.id}', '${f.key}')">+ ${f.label}</button>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const links = t.asset_links || {};
+  const showPipeline = t.task_type === 'post' || t.task_type === 'batch_shoot';
+
+  const stages = [
+    { key: 'status_script_ready', label: 'Script ready' },
+    { key: 'status_filmed', label: 'Filmed' },
+    { key: 'status_edited', label: 'Edited' },
+    { key: 'status_uploaded', label: 'Uploaded' },
+    { key: 'status_posted', label: 'Posted' }
+  ];
+
+  const pipelineHtml = showPipeline ? `
+    <div class="pipeline">
+      ${stages.map(s => `
+        <div class="stage ${t[s.key] ? 'done' : ''}" data-task="${t.id}" data-key="${s.key}">
+          <span class="check"></span>${s.label}
+        </div>
+      `).join('')}
+    </div>
+    <div class="meta-row">
+      <div>
+        <label>Drive folder / file URL</label>
+        <input type="text" data-task="${t.id}" data-link="drive" value="${escapeAttr(links.drive)}" placeholder="https://drive.google.com/..." />
+      </div>
+      <div>
+        <label>Posted URL (TikTok / LinkedIn / etc)</label>
+        <input type="text" data-task="${t.id}" data-link="post_url" value="${escapeAttr(links.post_url)}" placeholder="https://..." />
+      </div>
+    </div>
+    <div style="margin-top:14px;">
+      <label style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 6px;">Notes</label>
+      <textarea data-task="${t.id}" data-field="notes" rows="2" placeholder="Anything to remember about this task...">${escapeHtml(t.notes)}</textarea>
+    </div>
+  ` : '';
+
+  const offPlanBadge = t.is_off_plan ? '<span class="pill pill-offplan">OFF-PLAN</span>' : '';
+  const deleteBtn = t.is_off_plan ? `<button class="delete-btn" onclick="confirmDelete('${t.id}')">Delete</button>` : '';
+
+  return `
+    <div class="card ${t.is_off_plan ? 'off-plan' : ''}">
+      <div class="card-head">
+        <div>
+          <span class="pill pill-${t.channel}">${channelLabel}</span>
+          ${t.pillar ? `<span class="pill pill-pillar">${pillarLabel(t.pillar)}</span>` : ''}
+          ${taskTypeLabel ? `<span class="pill pill-production">${taskTypeLabel}</span>` : ''}
+          ${offPlanBadge}
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="card-subtitle">${t.is_off_plan ? 'Off-plan' : 'Day ' + t.day_number}</span>
+          ${deleteBtn}
+        </div>
+      </div>
+      <input type="text" class="card-title" data-task="${t.id}" data-field="title" value="${escapeAttr(t.title)}" />
+      ${sectionsHtml}
+      ${addFieldButtons}
+      ${pipelineHtml}
+    </div>
+  `;
+}
+
+function addEmptyField(taskId, fieldKey) {
+  const task = TASKS.find(t => t.id === taskId);
+  if (!task) return;
+  task[fieldKey] = ' ';
+  renderToday();
+  setTimeout(() => {
+    const el = document.getElementById(`field-${taskId}-${fieldKey}`);
+    if (el) { el.value = ''; el.focus(); }
+  }, 50);
+}
+
+async function confirmDelete(taskId) {
+  if (!confirm('Delete this off-plan task? This cannot be undone.')) return;
+  try {
+    await deleteTask(taskId);
+    TASKS = TASKS.filter(t => t.id !== taskId);
+    showSaved();
+    renderProgress();
+    renderActiveView();
+  } catch (e) {
+    alert('Delete failed: ' + e.message);
+  }
+}
+
+function renderWeek() {
+  const today = getToday();
+  const todayDate = new Date(today + 'T00:00:00');
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(todayDate);
+    d.setDate(d.getDate() + i);
+    days.push(d.toISOString().slice(0, 10));
+  }
+
+  const html = `
+    <div class="week-grid">
+      ${days.map(d => renderDayCell(d, today, false)).join('')}
+    </div>
+  `;
+  document.getElementById('view-week').innerHTML = html;
+  attachDayCellClickHandlers();
+}
+
+function renderMonth() {
+  const today = getToday();
+  const allDays = [];
+  for (let i = 1; i <= 30; i++) allDays.push(dateForDay(i));
+
+  const firstDate = new Date(allDays[0] + 'T00:00:00');
+  const firstWeekday = firstDate.getDay();
+  const cells = [];
+  for (let i = 0; i < firstWeekday; i++) cells.push(null);
+  allDays.forEach(d => cells.push(d));
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const html = `
+    <div class="month-weekday-row">
+      ${weekdays.map(w => `<div class="month-weekday">${w}</div>`).join('')}
+    </div>
+    <div class="month-grid">
+      ${cells.map(d => d ? renderDayCell(d, today, true) : '<div class="day-cell empty"></div>').join('')}
+    </div>
+  `;
+  document.getElementById('view-month').innerHTML = html;
+  attachDayCellClickHandlers();
+}
+
+function renderDayCell(d, today, compact) {
+  const dayTasks = TASKS.filter(t => t.task_date === d).filter(t => t.task_type === 'post' || t.task_type === 'batch_shoot');
+  const dayNum = dayNumberFromDate(d);
+  const isToday = d === today;
+  const isPast = d < today;
+  const dateLabel = compact
+    ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+  const limit = compact ? 4 : 6;
+  const tasksHtml = dayTasks.slice(0, limit).map(t => {
+    const isPosted = t.status_posted;
+    const isBatch = t.task_type === 'batch_shoot';
+    const offPlan = t.is_off_plan;
+    const cls = ['day-cell-task', isBatch ? 'batch' : '', isPosted ? 'posted' : '', offPlan ? 'off-plan' : ''].filter(Boolean).join(' ');
+    const titleStr = t.title.length > (compact ? 32 : 48) ? t.title.slice(0, compact ? 32 : 48) + '…' : t.title;
+    const prefix = isBatch ? '🎬 ' : '';
+    const channel = compact ? t.channel.slice(0, 2).toUpperCase() : t.channel.toUpperCase();
+    return `<div class="${cls}" title="${escapeAttr(t.title)}">${isPosted ? '✓ ' : ''}<strong>${channel}</strong> ${prefix}${escapeHtml(titleStr)}</div>`;
+  }).join('');
+
+  const overflow = dayTasks.length > limit ? `<div style="font-size:10px;color:var(--text-muted);margin-top:2px;">+${dayTasks.length - limit} more</div>` : '';
+
+  return `
+    <div class="day-cell ${isToday ? 'is-today' : ''} ${isPast && !isToday ? 'is-past' : ''}" data-date="${d}">
+      <div class="day-cell-head">${dateLabel}</div>
+      <div class="day-cell-num">${dayNum >= 1 && dayNum <= 30 ? `Day ${dayNum}` : '—'}</div>
+      ${tasksHtml}
+      ${overflow}
+    </div>
+  `;
+}
+
+function attachDayCellClickHandlers() {
+  document.querySelectorAll('.day-cell:not(.empty)').forEach(cell => {
+    cell.addEventListener('click', () => {
+      viewingDate = cell.dataset.date;
+      switchView('today');
+    });
+  });
+}
+
+function renderStatus() {
+  const today = getToday();
+  const allDays = [];
+  for (let i = 1; i <= 30; i++) allDays.push(dateForDay(i));
+
+  const channelCols = ['tiktok', 'linkedin', 'youtube', 'production', 'other'];
+
+  const html = `
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+      Each row is a day. Each cell shows what's planned for that channel and its status.
+      <span class="status-cell posted" style="margin: 0 4px;">posted</span>
+      <span class="status-cell in-flight" style="margin: 0 4px;">in flight</span>
+      <span class="status-cell not-started" style="margin: 0 4px;">not started</span>
+    </div>
+    <table class="status-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;">Day</th>
+          ${channelCols.map(c => `<th>${c.charAt(0).toUpperCase() + c.slice(1)}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${allDays.map(d => {
+          const dayN = dayNumberFromDate(d);
+          const isToday = d === today;
+          const dateLabel = new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+          return `
+            <tr class="${isToday ? 'is-today' : ''}">
+              <td class="day-col">
+                <div style="font-weight:500;">Day ${dayN}</div>
+                <div style="font-size:11px; color:var(--text-muted);">${dateLabel}</div>
+              </td>
+              ${channelCols.map(c => {
+                const cellTasks = TASKS.filter(t => t.task_date === d && t.channel === c && (t.task_type === 'post' || t.task_type === 'batch_shoot'));
+                if (cellTasks.length === 0) return `<td>—</td>`;
+                return `<td>${cellTasks.map(t => {
+                  const stage = getStage(t);
+                  const cls = stage === 'posted' ? 'posted' : (stage === 'not_started' ? 'not-started' : 'in-flight');
+                  const offPlanCls = t.is_off_plan ? ' off-plan' : '';
+                  const icon = stage === 'posted' ? '✓ ' : (stage === 'not_started' ? '○ ' : '◐ ');
+                  return `<span class="status-cell ${cls}${offPlanCls}" data-task-jump="${t.id}" data-date="${d}" title="${escapeAttr(t.title)} — ${stage.replace('_', ' ')}">${icon}${escapeHtml(t.title.length > 22 ? t.title.slice(0, 22) + '…' : t.title)}</span>`;
+                }).join('')}</td>`;
+              }).join('')}
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+  document.getElementById('view-status').innerHTML = html;
+
+  document.querySelectorAll('[data-task-jump]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      viewingDate = el.dataset.date;
+      switchView('today');
+    });
+  });
+}
+
+function renderPipeline() {
+  const channelFilter = document.getElementById('filter-channel').value;
+  const stageFilter = document.getElementById('filter-stage').value;
+  const planFilter = document.getElementById('filter-plan').value;
+  const today = getToday();
+
+  let filtered = TASKS.filter(t => t.task_type === 'post' || t.task_type === 'batch_shoot');
+  if (channelFilter) filtered = filtered.filter(t => t.channel === channelFilter);
+  if (stageFilter) filtered = filtered.filter(t => getStage(t) === stageFilter);
+  if (planFilter === 'planned') filtered = filtered.filter(t => !t.is_off_plan);
+  if (planFilter === 'off_plan') filtered = filtered.filter(t => t.is_off_plan);
+
+  const html = `
+    <table class="pipeline-table">
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Date</th>
+          <th>Channel</th>
+          <th>Title</th>
+          <th>Stage</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.map(t => `
+          <tr class="${t.task_date === today ? 'is-today' : ''}" data-task-jump="${t.id}" data-date="${t.task_date}" style="cursor:pointer;">
+            <td><strong>${t.day_number}</strong>${t.is_off_plan ? ' <span style="font-size:10px;color:var(--purple);">+</span>' : ''}</td>
+            <td>${formatDateShort(t.task_date)}</td>
+            <td><span class="pill pill-${t.channel}">${t.channel}</span></td>
+            <td>${escapeHtml(t.title)}</td>
+            <td><span class="stage-badge stage-${getStage(t)}">${getStage(t).replace('_', ' ')}</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  document.getElementById('pipeline-list').innerHTML = html;
+
+  document.querySelectorAll('#pipeline-list [data-task-jump]').forEach(el => {
+    el.addEventListener('click', () => {
+      viewingDate = el.dataset.date;
+      switchView('today');
+    });
+  });
+}
+
+function attachCardHandlers() {
+  document.querySelectorAll('.stage[data-task]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const taskId = el.dataset.task;
+      const key = el.dataset.key;
+      const task = TASKS.find(t => t.id === taskId);
+      if (!task) return;
+      const newVal = !task[key];
+      task[key] = newVal;
+      el.classList.toggle('done', newVal);
+
+      const patch = { [key]: newVal };
+      if (key === 'status_posted' && newVal) patch.posted_at = new Date().toISOString();
+
+      try {
+        await updateTask(taskId, patch);
+        showSaved();
+        renderProgress();
+      } catch (e) {
+        alert('Save failed: ' + e.message);
+        task[key] = !newVal;
+        el.classList.toggle('done', !newVal);
+      }
+    });
+  });
+
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.copyTarget);
+      if (!target) return;
+      const text = target.value;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        const original = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = original;
+        }, 1500);
+      });
+    });
+  });
+
+  document.querySelectorAll('textarea[data-task][data-field], input[data-task][data-field]').forEach(el => {
+    let timer;
+    el.addEventListener('input', () => {
+      clearTimeout(timer);
+      const taskId = el.dataset.task;
+      const field = el.dataset.field;
+      const val = el.value;
+      timer = setTimeout(async () => {
+        const task = TASKS.find(t => t.id === taskId);
+        if (!task) return;
+        task[field] = val;
+        try {
+          await updateTask(taskId, { [field]: val });
+          showSaved();
+        } catch (e) { console.error(e); }
+      }, 700);
+    });
+  });
+
+  document.querySelectorAll('input[data-link]').forEach(inp => {
+    let timer;
+    inp.addEventListener('input', () => {
+      clearTimeout(timer);
+      const taskId = inp.dataset.task;
+      const linkKey = inp.dataset.link;
+      const val = inp.value;
+      timer = setTimeout(async () => {
+        const task = TASKS.find(t => t.id === taskId);
+        if (!task) return;
+        task.asset_links = task.asset_links || {};
+        task.asset_links[linkKey] = val;
+        try {
+          await updateTask(taskId, { asset_links: task.asset_links });
+          showSaved();
+        } catch (e) { console.error(e); }
+      }, 700);
+    });
+  });
+}
+
+function openAddModal() {
+  document.getElementById('m-date').value = viewingDate || getToday();
+  document.getElementById('m-channel').value = 'tiktok';
+  document.getElementById('m-title').value = '';
+  document.getElementById('m-hook').value = '';
+  document.getElementById('m-body').value = '';
+  document.getElementById('m-caption').value = '';
+  document.getElementById('m-hashtags').value = '';
+  document.getElementById('add-modal').classList.add('show');
+  setTimeout(() => document.getElementById('m-title').focus(), 50);
+}
+
+function closeAddModal() {
+  document.getElementById('add-modal').classList.remove('show');
+}
+
+async function saveNewTask() {
+  const date = document.getElementById('m-date').value;
+  const channel = document.getElementById('m-channel').value;
+  const title = document.getElementById('m-title').value.trim();
+  if (!title) { alert('Title is required.'); return; }
+  if (!date) { alert('Date is required.'); return; }
+
+  const dayN = dayNumberFromDate(date);
+
+  const newTask = {
+    day_number: dayN,
+    task_date: date,
+    owner: 'peri',
+    channel: channel,
+    task_type: 'post',
+    title: title,
+    hook: document.getElementById('m-hook').value || null,
+    body: document.getElementById('m-body').value || null,
+    caption: document.getElementById('m-caption').value || null,
+    hashtags: document.getElementById('m-hashtags').value || null,
+    is_off_plan: true,
+    status_script_ready: true
+  };
+
+  const btn = document.getElementById('modal-save-btn');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  try {
+    const result = await insertTask(newTask);
+    const inserted = Array.isArray(result) ? result[0] : result;
+    TASKS.push(inserted);
+    TASKS.sort((a, b) => a.task_date.localeCompare(b.task_date) || a.channel.localeCompare(b.channel));
+    closeAddModal();
+    showSaved();
+    renderProgress();
+    renderActiveView();
+  } catch (e) {
+    alert('Save failed: ' + e.message);
+  } finally {
+    btn.textContent = 'Add task';
+    btn.disabled = false;
+  }
+}
+
+function switchView(name) {
+  activeView = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  renderActiveView();
+}
+
+function renderActiveView() {
+  if (activeView === 'today') renderToday();
+  if (activeView === 'week') renderWeek();
+  if (activeView === 'month') renderMonth();
+  if (activeView === 'status') renderStatus();
+  if (activeView === 'pipeline') renderPipeline();
+}
+
+let saveTimer;
+function showSaved() {
+  const ind = document.getElementById('save-indicator');
+  ind.classList.add('show');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => ind.classList.remove('show'), 1200);
+}
+
+async function init() {
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    document.getElementById('config-screen').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('app').style.display = 'block';
+
+  try {
+    TASKS = await loadAllTasks();
+  } catch (e) {
+    alert('Could not load tasks: ' + e.message + '\n\nMake sure 01_schema.sql, 02_seed_peri.sql, and 03_schema_patch_v2.sql have all been run in Supabase.');
+    resetConfig();
+    return;
+  }
+
+  renderHeader();
+  renderProgress();
+  renderToday();
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => switchView(tab.dataset.view));
+  });
+
+  document.getElementById('filter-channel').addEventListener('change', renderPipeline);
+  document.getElementById('filter-stage').addEventListener('change', renderPipeline);
+  document.getElementById('filter-plan').addEventListener('change', renderPipeline);
+
+  document.getElementById('add-modal').addEventListener('click', e => {
+    if (e.target.id === 'add-modal') closeAddModal();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('add-modal').classList.contains('show')) {
+      closeAddModal();
+    }
+  });
+}
+
+init();
+</script>
+</body>
+</html>
