@@ -1,9 +1,9 @@
 # SIGNAL Dashboard — Setup Guide
 
 A single-page dashboard that turns Erin's 30-day plan into something you can run from one screen.
-Connects to your Supabase project. Pre-loaded with all your TikTok and LinkedIn content.
+Connects to your Supabase project. Pre-loaded with content for Peri and Erin.
 
-> **Team members (Erin, Aiden):** the live dashboard is at the GitHub Pages URL Peri shared with you. Open it, paste the Supabase URL + anon key Peri sent privately, click Connect. You only do this once per device. Don't commit your keys to this repo. **First time on a new project? Run the SQL files in order in Supabase before connecting (see Step 1–3 below).**
+> **Team members (Erin, Aiden):** the live dashboard is at the GitHub Pages URL Peri shared with you. Open it, paste the Supabase URL + anon key Peri sent privately, click Connect. Once you're in, use the **"Viewing"** dropdown top-right to switch between Peri / Erin / Everyone — your choice persists on that device. You only paste keys once per device. Don't commit your keys to this repo.
 
 ## What you get
 
@@ -40,7 +40,13 @@ Everything saves to Supabase the moment you click. Open it on your laptop, your 
 2. Paste `03_schema_patch_v2.sql`. Click **Run**.
 3. Adds an `is_off_plan` column. Non-destructive — your existing data is untouched. Safe to re-run.
 
-### Step 4 — Get your Supabase credentials
+### Step 4 — Load Erin's content
+
+1. **New query**.
+2. Paste `04_seed_erin.sql`. Click **Run**.
+3. You should see "Success. ~110 rows affected." Re-runnable: it wipes Erin's rows first.
+
+### Step 5 — Get your Supabase credentials
 
 Settings → API. Copy:
 - **Project URL** — `https://xxxxxxxxxx.supabase.co`
@@ -48,13 +54,22 @@ Settings → API. Copy:
 
 ⚠️ Use the **anon** key, NOT the `service_role` key.
 
-### Step 5 — Open the dashboard
+### Step 6 — Open the dashboard
 
-1. Double-click `dashboard.html`.
+1. Double-click `dashboard.html` (or open the GitHub Pages URL).
 2. First time only: paste your URL and anon key. Click Connect.
-3. Done. Bookmark it.
+3. Pick who you are from the **"Viewing"** dropdown top-right (Peri or Erin). Your choice saves automatically.
+4. Done. Bookmark it.
 
 ---
+
+## What's new in v3 (multi-owner)
+
+- **Erin's full task list loaded** — 109 tasks across LinkedIn, Facebook, WRN Company, Instagram (Reels + 30 Stories), Reddit (4 long-form posts), and ops (daily metrics, Friday reviews, Monday standups, ad management milestones).
+- **"Viewing" picker** in the header — toggle between Peri / Erin / Everyone. Default is whoever each device picked last.
+- **Owner badges** — when viewing "Everyone," each card and grid cell shows whose task it is (orange for Peri, teal for Erin).
+- **Status view adapts** — when viewing Erin, shows her relevant channel columns (Instagram, Facebook, Reddit, Ops) instead of Peri's (Production, etc).
+- **Off-plan tasks** auto-file under whoever's currently viewing — Erin adds an off-plan post, it goes under her name.
 
 ## What's new in v2 (vs. v1)
 
@@ -136,6 +151,7 @@ Or just keep the local file. It works the same.
 | File | What it does | When to run |
 |---|---|---|
 | `01_schema.sql` | Creates the `signal_tasks` table, RLS policy, helper views | Once, first install |
-| `02_seed_peri.sql` | Loads 49 tasks (30 TikToks, 13 LinkedIn, 6 YouTube/batch days) | Once, first install |
-| `03_schema_patch_v2.sql` | Adds `is_off_plan` column for tasks you add manually | Once, after `02_seed_peri.sql` |
+| `02_seed_peri.sql` | Loads Peri's 49 tasks (30 TikToks, 13 LinkedIn, 6 YouTube/batch days) | Once, first install |
+| `03_schema_patch_v2.sql` | Adds `is_off_plan` column for off-plan tasks | Once, after `02_seed_peri.sql` |
+| `04_seed_erin.sql` | Loads Erin's 109 tasks across all her channels | Once, after `03_schema_patch_v2.sql` |
 | `dashboard.html` | The dashboard itself. Single file. | Open in browser |
